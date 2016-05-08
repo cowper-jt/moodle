@@ -1477,17 +1477,17 @@ function message_print_search_results($frm, $showicontext=false, $currentuser=nu
                 echo message_get_fragment($message->smallmessage, $keywords);
                 echo html_writer::start_tag('div', array('class' => 'link'));
 
-                // If the user clicks the context link display message sender on the left.
-                // EXCEPT if the current user is in the conversation. Current user == always on the left.
+                // If the user clicks the context link display message sender on the right.
+                // EXCEPT if the current user is in the conversation. Current user == always on the right.
                 $leftsideuserid = $rightsideuserid = null;
                 if ($currentuser->id == $message->useridto) {
-                    $leftsideuserid = $message->useridto;
-                    $rightsideuserid = $message->useridfrom;
-                } else {
-                    $leftsideuserid = $message->useridfrom;
                     $rightsideuserid = $message->useridto;
+                    $leftsideuserid = $message->useridfrom;
+                } else {
+                    $rightsideuserid = $message->useridfrom;
+                    $leftsideuserid = $message->useridto;
                 }
-                message_history_link($leftsideuserid, $rightsideuserid, false,
+                message_history_link($rightsideuserid, $leftsideuserid, false,
                                      $messagesearchstring, 'm'.$message->id, $strcontext);
                 echo html_writer::end_tag('div');
                 echo html_writer::end_tag('td');
@@ -1640,7 +1640,7 @@ function message_contact_link($userid, $linktype='add', $return=false, $script=n
 /**
  * echo or return a link to take the user to the full message history between themselves and another user
  *
- * @param int $userid1 the ID of the user displayed on the left (usually the current user)
+ * @param int $userid1 the ID of the user displayed on the right (usually the current user)
  * @param int $userid2 the ID of the other user
  * @param bool $return true to return the link as a string. False to echo the link.
  * @param string $keywords any keywords to highlight in the message history
@@ -2134,16 +2134,6 @@ function message_print_message_history($user1, $user2 ,$search = '', $messagelim
 
     echo $OUTPUT->box_start('center', 'message_user_pictures');
     echo $OUTPUT->box_start('user');
-    echo $OUTPUT->box_start('generalbox', 'user1');
-    echo $OUTPUT->user_picture($user1, array('size' => 100, 'courseid' => SITEID));
-    echo html_writer::tag('div', fullname($user1), array('class' => 'heading'));
-    echo $OUTPUT->box_end();
-    echo $OUTPUT->box_end();
-
-    $imgattr = array('src' => $OUTPUT->pix_url('i/twoway'), 'alt' => '', 'width' => 16, 'height' => 16);
-    echo $OUTPUT->box(html_writer::empty_tag('img', $imgattr), 'between');
-
-    echo $OUTPUT->box_start('user');
     echo $OUTPUT->box_start('generalbox', 'user2');
     // Show user picture with link is real user else without link.
     if (core_user::is_real_user($user2->id)) {
@@ -2165,6 +2155,16 @@ function message_print_message_history($user1, $user2 ,$search = '', $messagelim
 
         echo html_writer::tag('div', $useractionlinks, array('class' => 'useractionlinks'));
     }
+    echo $OUTPUT->box_end();
+    echo $OUTPUT->box_end();
+
+    $imgattr = array('src' => $OUTPUT->pix_url('i/twoway'), 'alt' => '', 'width' => 16, 'height' => 16);
+    echo $OUTPUT->box(html_writer::empty_tag('img', $imgattr), 'between');
+
+    echo $OUTPUT->box_start('user');
+    echo $OUTPUT->box_start('generalbox', 'user1');
+    echo $OUTPUT->user_picture($user1, array('size' => 100, 'courseid' => SITEID));
+    echo html_writer::tag('div', fullname($user1), array('class' => 'heading'));
     echo $OUTPUT->box_end();
     echo $OUTPUT->box_end();
     echo $OUTPUT->box_end();
@@ -2205,10 +2205,10 @@ function message_print_message_history($user1, $user2 ,$search = '', $messagelim
 
             if ($message->useridfrom == $user1->id) {
                 $formatted_message = message_format_message($message, $messagedate, $search, 'me');
-                $side = 'left';
+                $side = 'right';
             } else {
                 $formatted_message = message_format_message($message, $messagedate, $search, 'other');
-                $side = 'right';
+                $side = 'left';
             }
 
             // Check if it is a read message or not.
